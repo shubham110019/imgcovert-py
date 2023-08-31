@@ -1,4 +1,5 @@
 from flask import Flask, request, render_template, jsonify
+from flask_cors import CORS  # Import the CORS module
 from PIL import Image
 import io
 import datetime
@@ -6,6 +7,7 @@ import base64
 import math
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/')
 def upload_page():
@@ -71,4 +73,4 @@ def get_human_readable_size(size_bytes):
     return f"{size:.2f} {size_names[i]}"
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+     app.run(debug=True, host='0.0.0.0')
