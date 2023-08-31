@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Format Converter</title>
+
+    <style>
+img{
+    height: 100px;
+}
+        </style>
+</head>
+<body>
+    <h1>Image Format Converter</h1>
+    <form id="uploadForm"  enctype="multipart/form-data">
+        <label for="image">Choose an image:</label>
+        <input type="file" id="image" name="image" accept="image/*" required multiple><br>
+        <label for="format">Select target format:</label>
+        <select id="format" name="format">
+            <option value="JPEG">JPEG</option>
+    <option value="PNG">PNG</option>
+    <option value="GIF">GIF</option>
+    <option value="BMP">BMP</option>
+    <option value="TIFF">TIFF</option>
+    <option value="EPS">EPS</option>
+    <option value="WEBP">WebP</option>
+    <option value="PPM">PPM</option>
+    <option value="ICO">ICO</option>
+    <option value="PCX">PCX</option>
+    <option value="TGA">TGA</option>
+    <option value="MPO">MPO</option>
+
+ 
+    
+</select><br>
+<button type="submit">Convert and Display</button>
+</form>
+<div id="response"></div>
+<script>
+  const uploadForm = document.getElementById('uploadForm');
+        const responseDiv = document.getElementById('response');
+
+        uploadForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const formData = new FormData(uploadForm);
+
+            try {
+                const response = await fetch('https://imgcvt.onrender.com/convert', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const responseData = await response.json();
+
+                if (Array.isArray(responseData.converted)) {
+                    responseDiv.innerHTML = '<h2>Converted Images:</h2>';
+
+                    const ul = document.createElement('ul');
+
+                    responseData.converted.forEach(image => {
+                        const li = document.createElement('li');
+                        const img = document.createElement('img');
+
+                        img.src = `data:image/${image.format};base64,${image.image}`;
+                        img.alt = 'Converted Image';
+
+                        const sizeP = document.createElement('p');
+                        sizeP.textContent = `Size: ${image.size} bytes`;
+
+                        const formatP = document.createElement('p');
+                        formatP.textContent = `Format: ${image.format}`;
+
+                        const dateP = document.createElement('p');
+                        dateP.textContent = `Conversion Date: ${image.date}`;
+
+                        const downloadLink = document.createElement('a');
+                        downloadLink.href = `data:image/${image.format};base64,${image.image}`;
+                        downloadLink.download = `converted_image.${image.format.toLowerCase()}`;
+                        downloadLink.textContent = 'Download';
+
+                        li.appendChild(img);
+                        li.appendChild(sizeP);
+                        li.appendChild(formatP);
+                        li.appendChild(dateP);
+                        li.appendChild(downloadLink);
+
+                        ul.appendChild(li);
+                    });
+
+                    responseDiv.appendChild(ul);
+                } else {
+                    responseDiv.innerHTML = '<p>No converted images available.</p>';
+                }
+
+                console.log(responseData);
+            } catch (error) {
+                console.error('Error:', error);
+                responseDiv.innerHTML = '<p>An error occurred during conversion.</p>';
+            }
+        });
+</script>
+</body>
+</html>
