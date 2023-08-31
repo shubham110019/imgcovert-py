@@ -71,4 +71,4 @@ def get_human_readable_size(size_bytes):
     return f"{size:.2f} {size_names[i]}"
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')
