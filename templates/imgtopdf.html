@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image to PDF Converter</title>
+    <!-- Add Bootstrap CSS link -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Image to PDF Converter</h1>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="image">Choose images:</label>
+                <input type="file" id="image" name="image" accept="image/*" required multiple class="form-control-file">
+            </div>
+            <div class="form-group">
+                <label for="orientation">Select the page orientation:</label>
+                <select id="orientation" name="orientation" class="form-control">
+                    <option value="portrait">Portrait</option>
+                    <option value="landscape">Landscape</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="page_size">Select the page size:</label>
+                <select id="page_size" name="page_size" class="form-control">
+                    <option value="A4">A4 (297x210 mm)</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Convert to PDF</button>
+        </form>
+        <div id="response" class="mt-4"></div>
+    </div>
+
+    <!-- Add Bootstrap and Fetch scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        const uploadForm = document.getElementById('uploadForm');
+        const responseDiv = document.getElementById('response');
+
+        uploadForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const formData = new FormData(uploadForm);
+
+            try {
+                const response = await fetch('https://imgcvt.onrender.com/imgtopdf', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    console.log(data);
+                    
+                    if (data.pdf && data.pdf.length > 0) {
+                        const pdfLinks = data.pdf.map((pdfInfo, index) => {
+                            const downloadLink = document.createElement('a');
+                            downloadLink.href = pdfInfo.pdf_links;
+                            downloadLink.download = `converted_images_${index}.pdf`;
+                            downloadLink.textContent = `Download PDF ${index + 1}`;
+
+                            return downloadLink;
+                        });
+
+                        responseDiv.innerHTML = '';
+                        pdfLinks.forEach((link, index) => {
+                            responseDiv.appendChild(link);
+                            if (index < pdfLinks.length - 1) {
+                                responseDiv.appendChild(document.createElement('br'));
+                            }
+                        });
+                    } else {
+                        responseDiv.innerHTML = '<div class="alert alert-warning">No PDFs available for download.</div>';
+                    }
+                } else {
+                    const errorText = await response.text();
+                    responseDiv.innerHTML = `<div class="alert alert-danger">${errorText}</div>`;
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                responseDiv.innerHTML = '<div class="alert alert-danger">An error occurred. Please try again.</div>';
+            }
+        });
+    </script>
+</body>
+</html>
