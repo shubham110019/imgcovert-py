@@ -15,6 +15,10 @@ CORS(app)
 def upload_page():
     return render_template('index.html')
 
+@app.route('/pdf')
+def upload_page():
+    return render_template('index.html')
+
 @app.route('/convert', methods=['POST'])
 def convert_images():
     converted = []
@@ -154,6 +158,6 @@ def get_human_readable_size(size_bytes):
     i = int(math.floor(math.log(size_bytes, 1024)))
     size = round(size_bytes / math.pow(1024, i), 2)
     return f"{size:.2f} {size_names[i]}"
-
+    
 if __name__ == '__main__':
      app.run(debug=True, host='0.0.0.0')
