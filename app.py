@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template, jsonify, make_response
 from flask_cors import CORS  # Import the CORS module
-from PIL import Image as PILImage
+from PIL import Image
 import io
 import datetime
 import base64
