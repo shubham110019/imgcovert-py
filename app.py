@@ -15,10 +15,6 @@ CORS(app)
 def upload_page():
     return render_template('index.html')
 
-@app.route('/pdf')
-def upload_page():
-    return render_template('index.html')
-
 @app.route('/convert', methods=['POST'])
 def convert_images():
     converted = []
