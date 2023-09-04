@@ -6,6 +6,9 @@ import os
 import base64
 from io import BytesIO
 
+app = Flask(__name__)
+CORS(app)
+
 bg_remove_bp = Blueprint('bg_remove', __name__)
 
 # Route to upload and convert CSV to JSON
