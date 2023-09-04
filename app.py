@@ -4,6 +4,7 @@ from image_conversion import image_conversion_bp
 from img_to_pdf import img_to_pdf_bp
 from img_compression import img_compression_bp
 from csv_file import csv_file_bp
+from bg_remove import bg_remove_bp
 
 app = Flask(__name__)
 CORS(app)
@@ -22,6 +23,7 @@ app.register_blueprint(image_conversion_bp)
 app.register_blueprint(img_to_pdf_bp)
 app.register_blueprint(img_compression_bp)
 app.register_blueprint(csv_file_bp)
+app.register_blueprint(bg_remove_bp)
 
 
 def get_human_readable_size(size_bytes):
