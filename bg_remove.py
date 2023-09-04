@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, Blueprint
+from flask_cors import CORS
 from rembg import remove
 from PIL import Image
 import os
@@ -6,12 +7,6 @@ import base64
 from io import BytesIO
 
 bg_remove_bp = Blueprint('bg_remove', __name__)
-
-# Function to convert file size to a human-readable format
-def remove_background(input_image):
-    with Image.open(input_image) as img:
-        output = remove(img)
-        return output
 
 # Route to upload and convert CSV to JSON
 @bg_remove_bp.route('/remove_bg', methods=['POST'])
@@ -51,3 +46,9 @@ def api_remove_background():
 
     except Exception as e:
         return str(e), 400
+    
+# Function to convert file size to a human-readable format
+def remove_background(input_image):
+    with Image.open(input_image) as img:
+        output = remove(img)
+        return output
