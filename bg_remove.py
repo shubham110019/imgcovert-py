@@ -19,20 +19,17 @@ def api_remove_background():
         if input_image.filename == '':
             return 'No selected image file', 400
 
-        original_image_base64 = base64.b64encode(input_image.read()).decode()
-
+        # Perform background removal
         output_image = remove_background(input_image)
 
+        # Convert the output image to base64
         buffered = BytesIO()
         output_image.save(buffered, format="PNG")
         result_image_base64 = base64.b64encode(buffered.getvalue()).decode()
 
         download_link = f'data:image/png;base64,{result_image_base64}'
 
-        oldpreview = f'data:image/png;base64,{original_image_base64}'
-
         response_data = {
-            'oldimage': oldpreview,
             'preview': download_link,
             'downloadlink': download_link,
             'format': 'png',
@@ -42,9 +39,8 @@ def api_remove_background():
 
     except Exception as e:
         return str(e), 400
-    
+
 def remove_background(input_image):
     with Image.open(input_image) as img:
         output = remove(img)
         return output
-    
