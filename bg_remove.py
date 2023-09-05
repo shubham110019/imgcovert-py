@@ -6,12 +6,8 @@ import os
 import base64
 from io import BytesIO
 
-app = Flask(__name__)
-CORS(app)
-
 bg_remove_bp = Blueprint('bg_remove', __name__)
 
-# Route to upload and convert CSV to JSON
 @bg_remove_bp.route('/remove_bg', methods=['POST'])
 def api_remove_background():
     try:
@@ -23,13 +19,10 @@ def api_remove_background():
         if input_image.filename == '':
             return 'No selected image file', 400
 
-        # Convert the original image to base64
         original_image_base64 = base64.b64encode(input_image.read()).decode()
 
-        # Remove background using rembg
         output_image = remove_background(input_image)
 
-        # Convert the processed image to base64
         buffered = BytesIO()
         output_image.save(buffered, format="PNG")
         result_image_base64 = base64.b64encode(buffered.getvalue()).decode()
@@ -50,8 +43,8 @@ def api_remove_background():
     except Exception as e:
         return str(e), 400
     
-# Function to convert file size to a human-readable format
 def remove_background(input_image):
     with Image.open(input_image) as img:
         output = remove(img)
         return output
+    
