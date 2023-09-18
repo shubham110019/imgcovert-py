@@ -6,8 +6,49 @@ import os
 import base64
 from io import BytesIO
 import concurrent.futures
+import json
+import time
+import uuid  # Import the uuid module
 
 bg_remove_bp = Blueprint('bg_remove', __name__)
+
+# Directory to save JSON file
+SAVE_DIR = 'api_data'
+
+# Create the directory if it doesn't exist
+os.makedirs(SAVE_DIR, exist_ok=True)
+
+# Path to the main JSON file
+MAIN_JSON_FILE = os.path.join(SAVE_DIR, 'data_api.json')
+
+# Function to save the date, website domain name, and unique ID to the main JSON file
+def save_data_to_json(unique_id, upload_date, website_domain):
+    data = {
+        'id': unique_id,
+        'upload_date': upload_date,
+        'website_domain': website_domain
+    }
+
+    # Load existing data or initialize with an empty list
+    existing_data = []
+
+    if os.path.exists(MAIN_JSON_FILE):
+        try:
+            with open(MAIN_JSON_FILE, 'r') as json_file:
+                existing_data = json.load(json_file)
+        except json.JSONDecodeError:
+            # Handle the case where the file is not valid JSON
+            pass
+
+    existing_data.append(data)  # Append the new data to the list
+
+    with open(MAIN_JSON_FILE, 'w') as json_file:
+        json.dump(existing_data, json_file, indent=4)
+
+# Create the main JSON file if it doesn't exist
+if not os.path.exists(MAIN_JSON_FILE):
+    with open(MAIN_JSON_FILE, 'w') as json_file:
+        json.dump([], json_file)
 
 # Route to upload and convert WebP image, remove the background, and send to users
 @bg_remove_bp.route('/remove_bg', methods=['POST'])
@@ -48,7 +89,16 @@ def api_remove_background():
 
         oldpreview = f'data:image/png;base64,{original_image_base64}'
 
+        # Extract the website domain name from the request URL
+        website_domain = request.url_root
+
+        # Generate a unique ID
+        unique_id = str(uuid.uuid4())
+
+        # Create a dictionary containing the response data
         response_data = {
+            'id': unique_id,
+            'upload_date': time.strftime("%Y-%m-%d %H:%M:%S"),
             'oldimage': oldpreview,
             'preview': download_link,
             'downloadlink': download_link,
@@ -58,6 +108,9 @@ def api_remove_background():
                 'height': image_height
             }
         }
+
+        # Save the data to the main JSON file
+        save_data_to_json(unique_id, response_data['upload_date'], website_domain)
 
         return jsonify(response_data)
 
