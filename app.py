@@ -5,9 +5,13 @@ from img_to_pdf import img_to_pdf_bp
 from img_compression import img_compression_bp
 from csv_file import csv_file_bp
 from bg_remove import bg_remove_bp
+import json  # Import the json module
 
 app = Flask(__name__)
 CORS(app)
+
+# Define the path to the main JSON file
+MAIN_JSON_FILE = './api_data/data_api.json'
 
 
 # Define allowed file extensions
@@ -25,6 +29,14 @@ app.register_blueprint(img_compression_bp)
 app.register_blueprint(csv_file_bp)
 app.register_blueprint(bg_remove_bp)
 
+@app.route('/api/bgdata', methods=['GET'])
+def api_data():
+    try:
+        with open(MAIN_JSON_FILE, 'r') as json_file:
+            data = json.load(json_file)
+        return jsonify(data)
+    except Exception as e:
+        return str(e), 400
 
 def get_human_readable_size(size_bytes):
     if size_bytes == 0:
